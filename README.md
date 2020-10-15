@@ -380,30 +380,37 @@ Don't allow users to access pages they can't use! Redirect from private and publ
 
 If the page refreshes after sign in, I should STILL be signed in!
 
-1. Store the token in local storage:
+1. Install a cookie library
+
+   ```bash
+   yarn add js-cookie
+   ```
+
+1. Store the token in a cookie:
 
    `actions/auth.js`
 
    ```javascript
+   import Cookies from "js-coookie";
    const setAuthToken = (token) => {
      if (token) {
-       localStorage.setItem("token", token);
+       Cookies.set("token", token);
        instance.defaults.headers.Authorization = `jwt ${token}`;
      } else {
        delete instance.defaults.headers.Authorization;
-       localStorage.removeItem("token");
+       Cookies.remove("token");
      }
    };
    ```
 
-2. Add an action that checks for a token in localstorage:
+1. Add an action that checks for a token in cookies:
 
    `actions/auth.js`
 
    ```javascript
    export const checkForExpiredToken = () => {
      // Get the token from local storage
-     const token = localStorage.getItem("token");
+     const token = Cookies.get("token");
 
      if (token) {
        const currentTimeInSeconds = Date.now() / 1000;
@@ -422,7 +429,7 @@ If the page refreshes after sign in, I should STILL be signed in!
    };
    ```
 
-3. Call the action from `redux/index.js`:
+1. Call the action from `redux/index.js`:
 
    ```javascript
    // Actions
