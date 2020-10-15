@@ -6,9 +6,11 @@
    - Explain that the backend has a protected route
    - Show the 401
 
-#### Basic Auth
+### Basic Auth
 
-2. Show that `Login.js` doesn't do anything yet.
+#### Logging in (frontend perspective)
+
+1. Show that `Login.js` doesn't do anything yet.
    Add a login action:
 
    `auth.js`
@@ -26,7 +28,7 @@
    };
    ```
 
-3. Connect action to `Login.js`. Show the token being logged. (username: `khalid`, password: `kalesalad`)
+2. Connect action to `Login.js`. Show the token being logged. (username: `khalid`, password: `kalesalad`)
 
    ```javascript
    import { login } from './redux/actions'
@@ -46,7 +48,7 @@
    )(Login);
    ```
 
-4. Explain JWT. Install `jwt-decode`. Decode the token. Set the user:
+3. Explain JWT. Install `jwt-decode`. Decode the token. Set the user:
 
    ```bash
    $ yarn add jwt-decode
@@ -61,7 +63,7 @@
    ...
    ```
 
-5. Wire up some redux:
+4. Wire up some redux:
 
    `actions/actionTypes.js`
 
@@ -95,7 +97,7 @@
 
    export default combineReducers({
      things: thingReducer,
-     user: userReducer
+     user: userReducer,
    });
    ```
 
@@ -104,42 +106,44 @@
    ```javascript
    // NOT exported.
    // Will only be used internally by other actions.
-   const setCurrentUser = token => {
+   const setCurrentUser = (token) => {
      const user = decode(token);
      return {
-       type: actionTypes.SET_CURRENT_USER,
-       payload: user
+       type: SET_CURRENT_USER,
+       payload: user,
      };
    };
    ```
 
    ```javascript
-   const user = res.data;
-   dispatch(setCurrentUser(user.token));
+   const { token } = res.data;
+   dispatch(setCurrentUser(token));
    ```
 
-6. Still not able to make the request! Time to set the token in the axios header:
+#### Logging in (backend perspective)
+
+1. Still not able to make the request! Time to set the token in the axios header:
 
    `actions/auth.js`
 
    ```javascript
-   const setAuthToken = token => {
+   const setAuthToken = (token) => {
      instance.defaults.headers.Authorization = `jwt ${token}`;
    };
 
-   const setCurrentUser = token => {
+   const setCurrentUser = (token) => {
      setAuthToken(token);
      const user = decode(token);
      return {
        type: actionTypes.SET_CURRENT_USER,
-       payload: user
+       payload: user,
      };
    };
    ```
 
 #### Signup
 
-7. Implement signup action:
+1. Implement signup action:
 
    `actions/auth.js`
 
@@ -156,7 +160,7 @@
 
    ```
 
-8. Connect to `Signup.js`. This will work BUT THE UX IS BAD (no indication that it worked!):
+2. Connect to `Signup.js`. This will work BUT THE UX IS BAD (no indication that it worked!):
 
    ```javascript
    ...
@@ -195,9 +199,7 @@
      );
    };
 
-   const mapStateToProps = ({ user }) => ({
-     user
-   });
+   const mapStateToProps = ({ user }) => ({ user });
 
    export default connect(mapStateToProps)(Logout);
    ```
@@ -218,9 +220,7 @@
      );
    };
 
-   const mapStateToProps = ({ user }) => ({
-     user
-   });
+   const mapStateToProps = ({ user }) => ({ user });
 
    export default connect(mapStateToProps)(Navbar);
    ```
@@ -267,14 +267,14 @@
 
    `Home.js`
 
-   ```javascript
-   const Home = ({user}) => {
+   ```jsx
+   const Home = ({ user }) => {
      return (
        ...
        {user && (
-       <Link to="/treasure" className="btn btn-lg btn-warning mx-auto">
-           TREASURE
-       </Link>
+          <Link to="/treasure" className="btn btn-lg btn-warning mx-auto">
+              TREASURE
+          </Link>
        )}
        ...
      );
@@ -290,7 +290,7 @@
 1. Demonstrate the `history` object in `Singup.js`. Explain where it came from:
 
    ```javascript
-       import {useHistory} from 'react-router-dom';
+       import { useHistory } from 'react-router-dom';
        ...
        const history = useHistory();
        console.log(history);
@@ -356,9 +356,7 @@ Don't allow users to access pages they can't use! Redirect from private and publ
       ...
     }
     ...
-    const mapStateToProps = ({user}) => ({
-      user
-    });
+    const mapStateToProps = ({ user }) => ({ user });
 
     export default connect(mapStateToProps)(Treasure);
     ```
@@ -373,9 +371,7 @@ Don't allow users to access pages they can't use! Redirect from private and publ
       ...
     }
     ...
-    const mapStateToProps = ({user}) => ({
-      user
-    });
+    const mapStateToProps = ({user}) => ({ user });
 
     export default connect(mapStateToProps)(Signup);
     ```
@@ -389,7 +385,7 @@ If the page refreshes after sign in, I should STILL be signed in!
    `actions/auth.js`
 
    ```javascript
-   const setAuthToken = token => {
+   const setAuthToken = (token) => {
      if (token) {
        localStorage.setItem("token", token);
        instance.defaults.headers.Authorization = `jwt ${token}`;
