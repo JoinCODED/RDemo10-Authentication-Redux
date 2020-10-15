@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-
+import {connect} from 'react-redux';
+import {login} from './redux/actions'
 const Login = props => {
   const [form, setForm] = useState({ username: "", password: "" });
 
@@ -9,10 +10,7 @@ const Login = props => {
 
   const handleSubmit = event => {
     event.preventDefault();
-    alert(`
-    YOUR USERNAME IS "${form.username}"
-    YOUR PASSWORD IS "${form.password}"
-    `);
+    props.login(form)
   };
 
   const { username, password } = form;
@@ -43,5 +41,8 @@ const Login = props => {
     </form>
   );
 };
+const mapDispatchToProps = dispatch => ({
+  login: userData => dispatch(login(userData))
+});
 
-export default Login;
+export default connect(null,mapDispatchToProps)(Login);

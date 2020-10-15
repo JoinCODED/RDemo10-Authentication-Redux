@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import {signup} from './redux/actions';
+import {connect} from 'react-redux';
+import {Redirect} from 'react-router-dom';
 
 const Signup = props => {
   const [form, setForm] = useState({
@@ -12,10 +15,11 @@ const Signup = props => {
 
   const handleSubmit = event => {
     event.preventDefault();
-    console.log(form);
+    props.signup(form)
   };
 
   const { username, email, password } = form;
+  if (props.user) return <Redirect to='/' />
   return (
     <div className="col-6 mx-auto">
       <div className="card my-5">
@@ -67,5 +71,8 @@ const Signup = props => {
     </div>
   );
 };
-
-export default Signup;
+const mapStateToProps = ({user}) => ({user})
+const mapDispatchToProps = dispatch => ({
+  signup: (userData) => dispatch(signup(userData))
+})
+export default connect(mapStateToProps,mapDispatchToProps)(Signup);
